@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 
 
-SAVE_PATH = "C:\\Users\\obazgir\\Dropbox\\Stacking REFINED\\Scripts\\NCI-Almanac\\Arithmetic\\"
+SAVE_PATH = "C:\\Users\\obazgir\\Dropbox\\Stacking REFINED\\Scripts\\NCI-Almanac\\Geometric\\"
 def TypeConverter(NSC1):
     yy = []
     for num in NSC1:
@@ -43,7 +43,7 @@ NCI_ALM_PD = pd.read_csv("C:\\Users\\obazgir\\Desktop\\REFINED project\\NCI-ALMA
 Cells = NCI_ALM_PD["CELLNAME"].unique().tolist()
 
 Results_Dic = {}
-for i in range(20):
+for i in range(1):
     Cell_Inf = NCI_ALM_PD[NCI_ALM_PD["CELLNAME"] == Cells[i]]
     UN_NSC1 = Cell_Inf["NSC1"].unique(); UN_NSC1 = UN_NSC1[~np.isnan(UN_NSC1)]; UN_NSC1.dtype = int; UN_NSC1 = UN_NSC1[UN_NSC1 !=0]
     UN_NSC2 = Cell_Inf["NSC2"].unique(); UN_NSC2 = UN_NSC2[~np.isnan(UN_NSC2)]; UN_NSC2 = np.array(UN_NSC2,np.int32); UN_NSC2 = UN_NSC2[UN_NSC2 !=0]
@@ -215,9 +215,6 @@ for i in range(20):
     # Geometric
     with open('C:\\Users\\obazgir\\Dropbox\\Stacking REFINED\\Scripts\\Geometric_REFINED\\theMapping_Init_Geo_Euc5.pickle','rb') as file:
         gene_names_Geo,coords_Geo,map_in_int_Geo = pickle.load(file)
-    # Arithmetic
-    with open('C:\\Users\\obazgir\\Dropbox\\Stacking REFINED\\Scripts\\theMapping_Init_Arith_Euc5.pickle','rb') as file:
-        gene_names_Ar,coords_Ar,map_in_int_Ar = pickle.load(file)
         
     #%% importing tensorflow    
     import tensorflow as tf
@@ -228,7 +225,7 @@ for i in range(20):
     cnt = 0                      # Image size = sqrt(#features (drug descriptors))		
     
     MODELS = ["LE","LLE","MDS","ISO"]
-    MODELS = ["Arithmetic"]
+    MODELS = ["Geometric"]
     for mdl in MODELS:
         if mdl == "LE":
             X_Train_D1_REFINED = REFINED_Im_Gen(X_Train_D1,nn, map_in_int_LE, gene_names_LE,coords_LE)
@@ -264,17 +261,17 @@ for i in range(20):
             X_Val_D1_REFINED = REFINED_Im_Gen(X_Val_D1,nn, map_in_int_ISO, gene_names_ISO,coords_ISO)
             X_Test_D1_REFINED = REFINED_Im_Gen(X_Test_D1,nn, map_in_int_ISO, gene_names_ISO,coords_ISO)
             
-            X_Train_D2_REFINED = REFINED_Im_Gen(X_Train_D2,nn, map_in_int_ISO, gene_names_Ar,coords_ISO)
+            X_Train_D2_REFINED = REFINED_Im_Gen(X_Train_D2,nn, map_in_int_ISO, gene_names_ISO,coords_ISO)
             X_Val_D2_REFINED = REFINED_Im_Gen(X_Val_D2,nn, map_in_int_ISO, gene_names_ISO,coords_ISO)
             X_Test_D2_REFINED = REFINED_Im_Gen(X_Test_D2,nn, map_in_int_ISO, gene_names_ISO,coords_ISO)
-        elif mdl == "Arithmetic":
-            X_Train_D1_REFINED = REFINED_Im_Gen(X_Train_D1,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
-            X_Val_D1_REFINED = REFINED_Im_Gen(X_Val_D1,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
-            X_Test_D1_REFINED = REFINED_Im_Gen(X_Test_D1,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
+        elif mdl == "Geometric":
+            X_Train_D1_REFINED = REFINED_Im_Gen(X_Train_D1,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
+            X_Val_D1_REFINED = REFINED_Im_Gen(X_Val_D1,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
+            X_Test_D1_REFINED = REFINED_Im_Gen(X_Test_D1,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
             
-            X_Train_D2_REFINED = REFINED_Im_Gen(X_Train_D2,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
-            X_Val_D2_REFINED = REFINED_Im_Gen(X_Val_D2,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
-            X_Test_D2_REFINED = REFINED_Im_Gen(X_Test_D2,nn, map_in_int_Ar, gene_names_Ar,coords_Ar)
+            X_Train_D2_REFINED = REFINED_Im_Gen(X_Train_D2,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
+            X_Val_D2_REFINED = REFINED_Im_Gen(X_Val_D2,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
+            X_Test_D2_REFINED = REFINED_Im_Gen(X_Test_D2,nn, map_in_int_Geo, gene_names_Geo,coords_Geo)
     
     
     
@@ -300,23 +297,23 @@ for i in range(20):
         
             # ARM 1
             input1 = layers.Input(shape = (Width, Height,1))
-            x1 = layers.Conv2D(37, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(input1)
+            x1 = layers.Conv2D(50, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(input1)
             x1 = layers.BatchNormalization()(x1)
             x1 = layers.Activation('relu')(x1)
-            x1 = layers.Conv2D(128, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(x1)
+            x1 = layers.Conv2D(74, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(x1)
             x1 = layers.BatchNormalization()(x1)
             x1 = layers.Activation('relu')(x1)
-            #x1 = layers.Conv2D(34, (1,1),padding='valid',strides=1,dilation_rate=1)(x1)
+            #x1 = layers.MaxPooling2D(pool_size=(2,2))(x1)
             Out1 = layers.Flatten()(x1)
             
             input2 = layers.Input(shape = (Width, Height,1))
-            y1 = layers.Conv2D(37, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(input2)
+            y1 = layers.Conv2D(50, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(input2)
             y1 = layers.BatchNormalization()(y1)
             y1 = layers.Activation('relu')(y1)
-            y1 = layers.Conv2D(128, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(y1)
+            y1 = layers.Conv2D(74, (nb_conv, nb_conv),padding='valid',strides=2,dilation_rate=1)(y1)
             y1 = layers.BatchNormalization()(y1)
             y1 = layers.Activation('relu')(y1)
-            #y1 = layers.Conv2D(34, (1,1),padding='valid',strides=1,dilation_rate=1)(y1)
+            #y1 = layers.MaxPooling2D(pool_size=(2,2))(y1)
             Out2 = layers.Flatten()(y1)
             
             x = layers.concatenate([Out1, Out2])
@@ -327,19 +324,19 @@ for i in range(20):
             x = layers.Dropout(1- 0.7)(x)
         
             
-#            x = layers.Dense(40)(x)
-#            x = layers.BatchNormalization()(x)
-#            x = layers.Activation('relu')(x)
-#            x = layers.Dropout(1- 0.7)(x)
+            x = layers.Dense(80)(x)
+            x = layers.BatchNormalization()(x)
+            x = layers.Activation('relu')(x)
+            x = layers.Dropout(1- 0.7)(x)
             
             Out = layers.Dense(1)(x)
             model = tf.keras.Model(inputs = [input1, input2], outputs = [Out])
             
-            initial_learning_rate = 0.0005239150768437365
+            initial_learning_rate = 0.00059226891573572
             lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate,
-                decay_steps=294461,
-                decay_rate=  0.7605822310951454,
+                decay_steps=184967,
+                decay_rate= 0.46674422330691123,
                 staircase=True)
             model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lr_schedule),
             loss='mse',
@@ -381,18 +378,18 @@ for i in range(20):
     
         Results_Data[cnt,:] = [CNN_NRMSE,MAE,CNN_PCC,CNN_R2,Bias]
         cnt +=1
-    Results = pd.DataFrame(data = Results_Data , columns = ["NRMSE","MAE","PCC","R2","Bias"], index = [Cells[i]])
-    Y_Val_Save_PD = pd.DataFrame(data = Y_Val_Save , columns = ["Y_Val","Arithmetic"])
-    Y_Test_Save_PD = pd.DataFrame(data = Y_Test_Save , columns = ["Y_Test","Arithmetic"])
+    Results = pd.DataFrame(data = Results_Data , columns = ["NRMSE","MAE","PCC","R2","Bias"], index = MODELS)
+    Y_Val_Save_PD = pd.DataFrame(data = Y_Val_Save , columns = ["Y_Val","Geo"])
+    Y_Test_Save_PD = pd.DataFrame(data = Y_Test_Save , columns = ["Y_Test","Geo"])
     # Name correction
     Cell_Name = Cells[i] 
     if Cell_Name.find("/"):
         Cell_Name = Cell_Name.replace("/", "_")
         
-    Y_Val_Save_PD.to_csv(SAVE_PATH + Cell_Name + "VAL.csv")
-    Y_Test_Save_PD.to_csv(SAVE_PATH + Cell_Name + "TEST.csv")
+    Y_Val_Save_PD.to_csv(SAVE_PATH + Cell_Name + "VAL2.csv")
+    Y_Test_Save_PD.to_csv(SAVE_PATH + Cell_Name + "TEST2.csv")
     Results_Dic[Cells[i]] = Results
 
 print(Results_Dic)
 
-with open(SAVE_PATH+'Results_Dic.csv', 'w') as f:[f.write('{0},{1}\n'.format(key, value)) for key, value in Results_Dic.items()]
+with open(SAVE_PATH+'Results_Dic2.csv', 'w') as f:[f.write('{0},{1}\n'.format(key, value)) for key, value in Results_Dic.items()]
